@@ -1,0 +1,10 @@
+[package]
+name = "openapi-rust"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+
+[[bin]]
+name = "openapi-rust"
+path = "src/main.rs"
