@@ -1,13 +1,36 @@
-use std::env;
+use std::{env, process};
+
+use commands::CommandOption;
+mod commands;
 mod output_messages;
+mod parser;
+
+use parser::Parser;
 
 fn main() {
     let args: Vec<String> = env::args().collect();
 
-    if args.len() == 1 || args[1] == "-h" || args[1] == "--help" {
+    if args.len() <= 1 {
         println!("{}", output_messages::HELP_MESSAGE);
-    } else {
-        println!("{}", output_messages::ERROR_MESSAGE);
+        process::exit(0);
+    }
+
+    match CommandOption::from_args(&args) {
+        Ok(CommandOption::Help) => {
+            println!("{}", output_messages::HELP_MESSAGE);
+            process::exit(0);
+        }
+        Ok(CommandOption::Generate(file)) => {
+            if !Parser::validate_extension(&file) {
+                eprintln!("{}", output_messages::UNSUPPORTED_FILETYPE_MESSAGE);
+                process::exit(1);
+            }
+        }
+        Err(err) => {
+            eprintln!("{}", err);
+            eprintln!("{}", output_messages::ERROR_MESSAGE);
+            process::exit(1);
+        }
     }
 }
 
@@ -69,11 +92,31 @@ mod tests {
             .output()
             .expect("Command execution failed");
 
-        let stdout = String::from_utf8_lossy(&output.stdout);
+        let stderr = String::from_utf8_lossy(&output.stderr);
 
         assert!(
-            stdout.contains(&output_messages::ERROR_MESSAGE),
+            stderr.contains(&output_messages::ERROR_MESSAGE),
             "Error message should be displayed"
+        );
+    }
+
+    #[test]
+    fn test_invalid_extension() {
+        let file_path = "tests/openapi_test.json";
+
+        let output = Command::new("cargo")
+            .arg("run")
+            .arg("--")
+            .arg("generate")
+            .arg(file_path)
+            .output()
+            .expect("Command execution failed!");
+
+        let stderr = String::from_utf8_lossy(&output.stderr);
+
+        assert!(
+            stderr.contains(&output_messages::UNSUPPORTED_FILETYPE_MESSAGE),
+            "Should have thrown unsupported file type"
         );
     }
 }

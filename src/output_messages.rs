@@ -18,3 +18,6 @@ pub const ERROR_MESSAGE: &str = "
 
     Usage: openapi-rust <option> <input_file> -o <output_file>
 ";
+
+pub const UNSUPPORTED_FILETYPE_MESSAGE: &str =
+    "Unsupported filetype. Currently we only support YAML for the specs";
