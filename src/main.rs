@@ -1,4 +1,4 @@
-use std::{env, process};
+use std::{env, path::Path, process};
 
 use commands::CommandOption;
 mod commands;
@@ -21,10 +21,7 @@ fn main() {
             process::exit(0);
         }
         Ok(CommandOption::Generate(file)) => {
-            if !Parser::validate_extension(&file) {
-                eprintln!("{}", output_messages::UNSUPPORTED_FILETYPE_MESSAGE);
-                process::exit(1);
-            }
+            let _ = Parser::new(Path::new(&file));
         }
         Err(err) => {
             eprintln!("{}", err);
