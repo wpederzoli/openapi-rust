@@ -21,3 +21,5 @@ pub const ERROR_MESSAGE: &str = "
 
 pub const UNSUPPORTED_FILETYPE_MESSAGE: &str =
     "Unsupported filetype. Currently we only support YAML for the specs";
+
+pub const UNSUPPORTED_OPENAPI_VERSION: &str = "Only OpenAPI v3.0.0 is supported";

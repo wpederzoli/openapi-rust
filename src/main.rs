@@ -21,7 +21,12 @@ fn main() {
             process::exit(0);
         }
         Ok(CommandOption::Generate(file)) => {
-            let _ = Parser::new(Path::new(&file));
+            let parser = Parser::new(Path::new(&file));
+
+            match parser {
+                Ok(_) => process::exit(0),
+                Err(_) => process::exit(1),
+            }
         }
         Err(err) => {
             eprintln!("{}", err);
@@ -32,7 +37,7 @@ fn main() {
 }
 
 #[cfg(test)]
-mod tests {
+mod cli_tests {
     use crate::output_messages;
     use std::process::Command;
 
@@ -99,7 +104,7 @@ mod tests {
 
     #[test]
     fn test_invalid_extension() {
-        let file_path = "tests/openapi_test.json";
+        let file_path = "src/tests/openapi_test.json";
 
         let output = Command::new("cargo")
             .arg("run")
