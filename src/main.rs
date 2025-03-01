@@ -1,4 +1,4 @@
-use std::{env, process};
+use std::{env, path::Path, process};
 
 use commands::CommandOption;
 mod commands;
@@ -21,9 +21,11 @@ fn main() {
             process::exit(0);
         }
         Ok(CommandOption::Generate(file)) => {
-            if !Parser::validate_extension(&file) {
-                eprintln!("{}", output_messages::UNSUPPORTED_FILETYPE_MESSAGE);
-                process::exit(1);
+            let parser = Parser::new(Path::new(&file));
+
+            match parser {
+                Ok(_) => process::exit(0),
+                Err(_) => process::exit(1),
             }
         }
         Err(err) => {
@@ -35,7 +37,7 @@ fn main() {
 }
 
 #[cfg(test)]
-mod tests {
+mod cli_tests {
     use crate::output_messages;
     use std::process::Command;
 
@@ -102,7 +104,7 @@ mod tests {
 
     #[test]
     fn test_invalid_extension() {
-        let file_path = "tests/openapi_test.json";
+        let file_path = "src/tests/openapi_test.json";
 
         let output = Command::new("cargo")
             .arg("run")
